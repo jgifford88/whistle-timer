@@ -5,36 +5,36 @@ import styled from 'styled-components'
 const MOUNT_NODE = document.getElementById('app')
 
 const Layout = styled.div`
-  display: grid;
-  text-align: center;
-  font-family: sans-serif;
+  display: grid
+  text-align: center
+  font-family: sans-serif
 `
 
 const TimerDisplay = styled.div`
-  padding: 10px;
-  font-family: 'VT323', sans-serif;
-  font-size: 60px;
+  padding: 10px
+  font-family: 'VT323', sans-serif
+  font-size: 60px
 `
 
 const TimerControls = styled.div`
-  display: inline-block;
+  display: inline-block
 `
 
 const TimerButton = styled.button`
-  font-size: 20px;
-  margin-right: 5px;
+  font-size: 20px
+  margin-right: 5px
 `
 
 const LapList = styled.div`
-  height: 600px;
-  padding: 15px;
-  text-align: right;
-  overflow-y: scroll;
+  height: 600px
+  padding: 15px
+  text-align: right
+  overflow-y: scroll
 `
 
 const Lap = styled.div`
-  font-size: 16px;
-  padding-bottom: 3px;
+  font-size: 16px
+  padding-bottom: 3px
 `
 
 
@@ -76,11 +76,11 @@ class Timer {
     let millis = parseInt((duration % 1000) / 10)
       , seconds = parseInt((duration / 1000) % 60)
       , minutes = parseInt((duration / (1000 * 60)) % 60)
-      , hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+      , hours = parseInt((duration / (1000 * 60 * 60)) % 24)
 
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
+    hours = (hours < 10) ? "0" + hours : hours
+    minutes = (minutes < 10) ? "0" + minutes : minutes
+    seconds = (seconds < 10) ? "0" + seconds : seconds
 
     return hours + ":" + minutes + ":" + seconds + "." + `${millis}`.padStart(2, 0)
   }
@@ -114,12 +114,12 @@ const App = ({ timer }) => {
 
   const animate = () => {
     setTime(timer.getTime())
-    requestAnimationFrame(animate);
+    requestAnimationFrame(animate)
   }
 
   useEffect(() => {
-    timerRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(timerRef.current);
+    timerRef.current = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(timerRef.current)
   }, [])
 
   return (

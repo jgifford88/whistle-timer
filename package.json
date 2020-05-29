@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test",
     "dev": "parcel serve ./index.html --port 12000"
   },
   "author": "",
