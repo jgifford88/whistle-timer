@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
 const MOUNT_NODE = document.getElementById('app')
 
 const Layout = styled.div`
+  display: grid;
   text-align: center;
   font-family: sans-serif;
 `
@@ -25,11 +26,9 @@ const TimerButton = styled.button`
 `
 
 const LapList = styled.div`
-  width: 300px;
   height: 600px;
-  margin: 0 auto;
   padding: 15px;
-  text-align: center;
+  text-align: right;
   overflow-y: scroll;
 `
 
@@ -38,59 +37,98 @@ const Lap = styled.div`
   padding-bottom: 3px;
 `
 
-const fmtTime = (duration) => {
-  let millis = parseInt((duration % 1000) / 10)
-    , seconds = parseInt((duration / 1000) % 60)
-    , minutes = parseInt((duration / (1000 * 60)) % 60)
-    , hours = parseInt((duration / (1000 * 60 * 60)) % 24);
 
-  hours = (hours < 10) ? "0" + hours : hours;
-  minutes = (minutes < 10) ? "0" + minutes : minutes;
-  seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-  return hours + ":" + minutes + ":" + seconds + "." + `${millis}`.padEnd(2, '0')
-}
-
-const App = () => {
-  const [counter, setCounter] = useState(0)
-  const [paused, setPaused] = useState(true)
-  const [laps, setLaps] = useState([])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!paused) setCounter(counter + 10)
-    }, 10)
-
-    return () => {
-      clearInterval(interval);
-    }
-  })
-
-  const handleStart = () => {
-    setPaused(false)
+class Timer {
+  constructor() {
+    this.interval = null
+    this.rate = 10
+    this.time = 0
+    this.paused = true
   }
 
-  const handleStop = () => {
-    setPaused(true)
+  start() {
+    this.paused = false
+    this.interval = setInterval(() => {
+      this.time = this.time + this.rate
+    }, this.rate)
+  }
+
+  pause() {
+    if (!this.interval) return
+    clearInterval(this.interval)
+    this.interval = null
+    this.paused = true
+  }
+
+  reset() {
+    this.time = 0
+  }
+
+  getTime() {
+    return this.fmtTime(this.time)
+  }
+
+  isPaused() {
+    return this.paused
+  }
+
+  fmtTime(duration) {
+    let millis = parseInt((duration % 1000) / 10)
+      , seconds = parseInt((duration / 1000) % 60)
+      , minutes = parseInt((duration / (1000 * 60)) % 60)
+      , hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds + "." + `${millis}`.padStart(2, 0)
+  }
+}
+
+const timer = new Timer()
+
+const App = ({ timer }) => {
+  const [time, setTime] = useState(timer.getTime())
+  const [laps, setLaps] = useState([])
+
+  const timerRef = useRef()
+
+  const handleStart = () => {
+    timer.start()
+  }
+
+  const handlePause = () => {
+    timer.pause()
   }
 
   const handleReset = () => {
-    setCounter(0)
+    timer.reset()
     setLaps([])
   }
 
   const handleLap = () => {
-    if (paused) return
-    setLaps([...laps, counter])
+    if (timer.isPaused()) return
+    setLaps([...laps, timer.getTime()])
   }
+
+  const animate = () => {
+    setTime(timer.getTime())
+    requestAnimationFrame(animate);
+  }
+
+  useEffect(() => {
+    timerRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(timerRef.current);
+  }, [])
 
   return (
     <Layout>
-      <TimerDisplay>{fmtTime(counter)}</TimerDisplay>
+      <TimerDisplay>{time}</TimerDisplay>
       <TimerControls>
-        {paused ?
+        {timer.isPaused() ?
           <TimerButton onClick={handleStart}>Start</TimerButton> :
-          <TimerButton onClick={handleStop}>Stop</TimerButton>
+          <TimerButton onClick={handlePause}>Stop</TimerButton>
         }
 
         <TimerButton onClick={handleReset}>Reset</TimerButton>
@@ -99,11 +137,11 @@ const App = () => {
 
       <LapList>
         {laps.map((lap, i) => (
-          <Lap key={i}>Lap {i + 1}: {fmtTime(lap)}</Lap>
+          <Lap key={i}>Lap {i + 1}: {lap}</Lap>
         ))}
       </LapList>
     </Layout>
   )
 }
 
-ReactDOM.render(<App />, MOUNT_NODE)
+ReactDOM.render(<App timer={timer} />, MOUNT_NODE)
