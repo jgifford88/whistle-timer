@@ -1,0 +1,20 @@
+Goal: Spin up a Stopwatch React.js app with the following features/requirements
+
+Functionality:
+
+- Displays elapsed time digitally, starting at 00:00
+- A start/stop button (should be ‘start’ if the watch isn’t running and vice versa)
+- A reset button (turns to 00:00 and does not change the running state of the watch)
+- A “Lap” button (records time elapsed since the last press of the button, or since 00:00)
+- A scrollable list of all laps recorded since the last “reset”
+
+Style:
+
+- Clock should be centered at the top of the page
+- All buttons should be centered underneath the clock
+- The list of laps should be somewhere on the right side of the screen (doesn’t matter if the list overflows and causes the page to grow infinitely).
+
+Misc:
+
+When finished, let’s jump on a screenshare so we can see a demo!
+In other words, don’t worry about hosting.
